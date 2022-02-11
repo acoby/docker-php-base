@@ -22,9 +22,46 @@ LABEL org.label-schema.schema-version="1.0" \
 EXPOSE 80
 
 RUN apt-get update --allow-releaseinfo-change && apt-get dist-upgrade -y && \
-    apt-get install -y libxml2-dev libpng-dev libfreetype6-dev libjpeg62-turbo-dev zip tnef ssl-cert libldap2-dev \
-      catdoc unzip tar imagemagick tesseract-ocr tesseract-ocr-eng poppler-utils exiv2 libzip-dev \
-      libmemcached-dev zlib1g-dev mariadb-client && \
+    apt-get install -y \
+      git \
+      curl \
+      libxml2-dev \
+      libpng-dev \
+      libfreetype6-dev \
+      libjpeg62-turbo-dev \
+      libmcrypt-dev \
+      libicu-dev \
+      libssl-dev \
+      libcurl4 \
+      libcurl4-openssl-dev \
+      zip \
+      unzip \
+      tnef \
+      ssl-cert \
+      libldap2-dev \
+      catdoc \
+      tar \
+      pngquant \
+      imagemagick \
+      tesseract-ocr \
+      tesseract-ocr-eng \
+      poppler-utils \
+      exiv2 \
+      libzip-dev \
+      mariadb-client \
+      memcached \
+      libmemcached-tools \
+      libmemcached-dev \
+      libzip-dev \
+      zlibc \
+      zlib1g-dev \
+      zlib1g && \
+    docker-php-ext-configure zip --with-libzip && \
+    docker-php-ext-install zip && \
+    pecl install memcached && \
+    docker-php-ext-configure memcached && \
+    docker-php-ext-install memcached && \
+    docker-php-ext-enable memcached && \
     docker-php-ext-configure gd --with-freetype --with-jpeg && \
     docker-php-ext-configure ldap && \
     docker-php-ext-install soap pdo pdo_mysql calendar gd sysvshm sysvsem sysvmsg ldap opcache intl pcntl zip bcmath && \
@@ -36,7 +73,11 @@ RUN apt-get update --allow-releaseinfo-change && apt-get dist-upgrade -y && \
         libasan5 libatomic1 libbinutils libcc1-0 libfreetype6-dev libicu-dev \
         libitm1 libjpeg62-turbo-dev libldap2-dev liblsan0 libmpc3 libmpfr6 libpng-dev \
         libpng-tools libquadmath0  libtsan0 libubsan1 libxml2-dev patch --autoremove || true && \
+    apt-get autoclean && \
     rm -rf /var/lib/apt/lists/* && \
+    rm -rf /usr/share/locale/* && \
+    rm -rf /usr/share/man/* && \
+    rm -rf /usr/share/doc/* && \
     touch /etc/apache2/conf-available/phpmyadmin-on.conf && \
     case ${TARGETARCH} in arm64) ARCH="aarch64" ;; amd64) ARCH="x86-64";; esac && \
     curl -L -o /tmp/ioncube_loader.tar.gz https://downloads.ioncube.com/loader_downloads/ioncube_loaders_lin_${ARCH}.tar.gz && \
