@@ -101,7 +101,8 @@ RUN apt-get update --allow-releaseinfo-change && apt-get dist-upgrade -y && \
     a2enmod rewrite && \
     a2enmod headers && \
     echo 'expose_php = off' > /usr/local/etc/php/conf.d/security.ini && \
-    mkdir /etc/msmtp.tpl
+    mkdir /etc/msmtp.tpl && \
+    chmod 755 /usr/local/bin/docker-entrypoint.sh
 
 COPY ./ci/etc/php.ini /usr/local/etc/php/
 COPY ./ci/etc/apache.conf /etc/apache2/conf-enabled/x-security.conf
