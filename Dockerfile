@@ -113,5 +113,5 @@ COPY ./ci/msmtp/mail.ini /etc/msmtp.tpl/mail.ini
 
 
 WORKDIR /var/www/html
-ENTRYPOINT ["/usr/local/bin/docker-go-entrypoint.sh"]
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
 HEALTHCHECK --interval=60s --timeout=5s --start-period=60s CMD curl --fail http://localhost/ || exit 1  
