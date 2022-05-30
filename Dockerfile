@@ -10,6 +10,13 @@ ARG BUILD_DATE
 ARG BUILD_VERSION
 ARG BUILD_BRANCH
 
+ENV MAIL_ENABLED off
+ENV MAIL_HOST localhost.localdomain
+ENV MAIL_PORT 25
+ENV MAIL_USERNAME nobody
+ENV MAIL_PASSWORD none
+ENV MAIL_ADDRESS nobody@localhost
+
 LABEL org.label-schema.schema-version="1.0" \
       org.label-schema.build-date=${BUILD_DATE} \
       org.label-schema.name="acoby PHP" \
@@ -20,6 +27,8 @@ LABEL org.label-schema.schema-version="1.0" \
       org.label-schema.version=${BUILD_VERSION}
 
 EXPOSE 80
+
+COPY ci/docker-entrypoint.sh /usr/local/bin/
 
 RUN apt-get update --allow-releaseinfo-change && apt-get dist-upgrade -y && \
     apt-get install -y \
@@ -49,6 +58,8 @@ RUN apt-get update --allow-releaseinfo-change && apt-get dist-upgrade -y && \
       exiv2 \
       libzip-dev \
       mariadb-client \
+      msmtp \
+      msmtp-mta \
       memcached \
       libmemcached-tools \
       libmemcached-dev \
@@ -89,11 +100,17 @@ RUN apt-get update --allow-releaseinfo-change && apt-get dist-upgrade -y && \
     echo "zend_extension = /usr/local/ioncube/ioncube_loader_lin_7.4.so" >> /usr/local/etc/php/conf.d/00_ioncube.ini && \
     a2enmod rewrite && \
     a2enmod headers && \
-    echo 'ServerTokens Prod' > /etc/apache2/conf-enabled/x-security.conf && \
-    echo 'ServerSignature Off' >> /etc/apache2/conf-enabled/x-security.conf && \
-    echo 'Header set X-Content-Type-Options: "nosniff"' >> /etc/apache2/conf-enabled/x-security.conf && \
-    echo 'expose_php = off' > /usr/local/etc/php/conf.d/security.ini
+    echo 'expose_php = off' > /usr/local/etc/php/conf.d/security.ini && \
+    mkdir /etc/msmtp.tpl
 
 COPY ./ci/etc/php.ini /usr/local/etc/php/
+COPY ./ci/etc/apache.conf /etc/apache2/conf-enabled/x-security.conf
 
+COPY ./ci/msmtp/msmtprc /etc/msmtp.tpl/msmtprc
+COPY ./ci/msmtp/aliases /etc/msmtp.tpl/aliases
+COPY ./ci/msmtp/mail.ini /etc/msmtp.tpl/mail.ini
+
+
+WORKDIR /var/www/html
+ENTRYPOINT ["/usr/local/bin/docker-go-entrypoint.sh"]
 HEALTHCHECK --interval=60s --timeout=5s --start-period=60s CMD curl --fail http://localhost/ || exit 1  
