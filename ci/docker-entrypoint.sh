@@ -18,5 +18,5 @@ if [ "_${MAIL_ENABLED}_" = "_on_" ]; then
 fi
 
 #call original entry point
-echo "Start PHP Service"
-docker-php-entrypoint "$@"
+echo "Start Docker PHP Service v7.4"
+docker-php-entrypoint --apache-foreground
