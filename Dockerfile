@@ -62,7 +62,8 @@ RUN apt-get update --allow-releaseinfo-change && apt-get dist-upgrade -y && \
     echo "zend_extension = /usr/local/ioncube/ioncube_loader_lin_7.4.so" >> /usr/local/etc/php/conf.d/00_ioncube.ini && \
     a2enmod rewrite && \
     a2enmod headers && \
-    echo 'expose_php = off' > /usr/local/etc/php/conf.d/xsecurity.ini
+    echo 'expose_php = off' > /usr/local/etc/php/conf.d/x-security.ini && \
+    chmod 755 /usr/local/bin/docker-entrypoint.sh
 
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
 HEALTHCHECK --interval=60s --timeout=5s --start-period=60s CMD curl --fail http://localhost/ || exit 1  
