@@ -1,0 +1,10 @@
+version: '2.3'
+
+services:
+  base:
+    build: .
+    restart: "unless-stopped"
+    ports:
+      - "10000:80"
+    volumes:
+      - "./www:/var/www/html"
